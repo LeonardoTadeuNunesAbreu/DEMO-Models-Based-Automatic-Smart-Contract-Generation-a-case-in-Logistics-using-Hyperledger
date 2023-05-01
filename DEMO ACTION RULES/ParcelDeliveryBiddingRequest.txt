@@ -1,0 +1,16 @@
+Rule: ParcelDeliveryBidingRequest
+
+
+"When": "A new bid is requested for an auction"
+"Inputs":
+- bidID: unique ID for the new bid
+- bitcircleAmount: amount of Bitcircle to be bid
+- moneyAmount: amount of money to be bid
+- reverseEconomy: whether the bidder requests a reverse economy
+- auctionId: ID of the auction for which the bid is requested
+"Conditions":
+- The auction exists in the system
+- The new bid is lower than the current lowest bid, if there is one  -- NOTE: This could be use "query"
+"Actions":
+- Set the previous lowest bid to "Outbidded" status and not a winner, if there is one
+- Create a new bid entity in the system

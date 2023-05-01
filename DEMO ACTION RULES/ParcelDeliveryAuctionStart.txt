@@ -1,0 +1,140 @@
+Rule: ParcelDeliveryAuctionStart
+"When": "A new auction "is" started for parcel delivery"
+"Inputs":
+- parcels: list of parcels to be auctioned
+- auction: auction details including start and end time, reserve price, etc.
+"Conditions":
+- The auction details are "valid"
+- Each parcel in the list exists in the system
+Actions:
+- "Create" a new auction entity in the system
+- "For each": "set": parcel, Action:"Create" an auctionHasParcel entity linking it to the auction
+
+WHEN ParcelDeliveryAuctionStart
+IS "REQUESTED"
+ACTION(s):{
+    IF {
+        CONDITION: "Is False"
+        TERM(s):{
+            comp_evaluated_expression: {
+                query:{
+                    FROM: "Auction"
+                    WHERE: "id" == PROPERTY:{scope: Entity, ent type: Auction, property: id} 
+                }
+            }
+        }
+    }
+    THEN{
+        ACTION:{
+            "user input of a single type",
+            action name: "Entity Creation Action"
+            scope: Entity: "Auction"
+            property(ies): {
+                PROPERTY:{
+                    "ID"
+                    mandatory: "True"
+                    value type: "int"
+                    validation condition(s):{
+                        VALIDATION CONDITION(s):
+                            condition(s):{
+                                VALIDATION CONDITITION: {
+                                    Not: "False"
+                                    "Higher Equal" 
+                                    1
+                                }
+                            }
+                    }
+                }
+                PROPERTY:{
+                   "StartDate"
+                    mandatory: "True"
+                    value type: "date"
+                },
+                PROPERTY:{
+                   "EndDate"
+                    mandatory: "True"
+                    value type: "date"
+                    validation condition(s):{
+                        VALIDATION CONDITION(s):
+                            condition(s):{
+                                VALIDATION CONDITITION: {
+                                    Not: "False"
+                                    "Higher Equal" 
+                                    PROPERTY:{scope: Entity, ent type: Auction, property: StartDate}
+                                }
+                            }
+                    }
+                }
+                PROPERTY:{
+                    "MaximumAmount"
+                    mandatory: "True"
+                    value type: "int"
+                    validation condition(s):{
+                        VALIDATION CONDITION(s):
+                            condition(s):{
+                                VALIDATION CONDITITION: {
+                                    Not: "False"
+                                    "Higher Equal" 
+                                    1
+                                }
+                            }
+                    }
+                }
+            }
+        }
+        ACTION:{
+            FOREACH{
+                IF {
+                    CONDITION: "Is False"
+                    TERM(s):{
+                        comp_evaluated_expression: {
+                            query:{
+                                FROM: "Parcel"
+                                WHERE: "id" == PROPERTY:{scope: Entity, ent type: Parcel, property: id} 
+                            }
+                        }
+                    }
+                }
+                THEN⁄{
+                    ACTION:{
+                        "user input of a single type",
+                        action name: "Entity Creation Action"
+                        scope: Entity: "auctionHasParcel"
+                        property(ies): {
+                            PROPERTY:{
+                                "AuctionID"
+                                mandatory: "True"
+                                value type: "int"
+                                validation condition(s):{
+                                    VALIDATION CONDITION(s):
+                                        condition(s):{
+                                            VALIDATION CONDITITION: {
+                                                Not: "False"
+                                                "Higher Equal" 
+                                                1
+                                            }
+                                        }
+                                }
+                            }
+                            PROPERTY:{
+                                "ParcelID"
+                                mandatory: "True"
+                                value type: "int"
+                                validation condition(s):{
+                                    VALIDATION CONDITION(s):
+                                        condition(s):{
+                                            VALIDATION CONDITITION: {
+                                                Not: "False"
+                                                "Higher Equal" 
+                                                1
+                                            }
+                                        }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
